@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer } from "react";
 
-const INITIAL_TIME = 5;
+const INITIAL_TIME = 1;
 
 type StateType = {
   isPlaying: boolean;
@@ -15,7 +15,10 @@ type StateType = {
 type ActionType =
   | { type: "SET_IS_PLAYING" }
   | { type: "SET_NEXT_STAGE" }
-  | { type: "SET_TIME" };
+  | { type: "SET_TIME" }
+  | { type: "BIDDING" }
+  | { type: "START_GAME" }
+  | { type: "FINISH_GAME" };
 
 type ContextProps = {
   state: StateType;
@@ -24,10 +27,9 @@ type ContextProps = {
 
 const defaultState: StateType = {
   isPlaying: true,
-  stage: 0,
+  stage: 1,
   second: INITIAL_TIME,
   worths: [
-    { id: 0, name: "스트레스 관리" },
     { id: 1, name: "빠른 피드백" },
     { id: 2, name: "자율 출퇴근" },
     { id: 3, name: "직무 적합도" },
@@ -37,6 +39,7 @@ const defaultState: StateType = {
     { id: 7, name: "높은 소득" },
     { id: 8, name: "마음이 맞는 동료" },
     { id: 9, name: "타인을 돕는 기쁨" },
+    { id: 10, name: "스트레스 관리" },
   ],
   nowPrice: 0,
   bidder: null,
@@ -59,6 +62,17 @@ const reducer = (state: StateType, action: ActionType) => {
     }
     case "SET_TIME": {
       return { ...state, second: state.second - 1 };
+    }
+    case "BIDDING": {
+      return { ...state, nowPrice: state.nowPrice + 5 };
+    }
+    case "START_GAME": {
+      //카드섞기
+      //배팅금액섞기
+      return { ...state };
+    }
+    case "FINISH_GAME": {
+      return { ...state, isPlaying: false };
     }
 
     default: {
