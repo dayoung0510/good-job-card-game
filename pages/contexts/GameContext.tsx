@@ -4,6 +4,12 @@ const INITIAL_TIME = 1;
 export const BOT_ID = 0;
 export const USER_ID = 1;
 
+type AwardListType = {
+  worthId: number | null;
+  bidder: number | null;
+  price: number | null;
+};
+
 type StateType = {
   isPlaying: boolean;
   stage: number;
@@ -12,7 +18,7 @@ type StateType = {
   nowPrice: number;
   nowBidder: number | null;
   botBettingArr: number[];
-  awardedList: { worthId: number; bidder: number; price: number }[];
+  awardedList: AwardListType[];
 };
 
 type ActionType =
@@ -70,14 +76,10 @@ const reducer = (state: StateType, action: ActionType) => {
         bidder: state.nowBidder,
         price: state.nowPrice,
       };
-      console.log("이걸추가해야댐", addObj);
+      console.log("award!");
       return {
         ...state,
-        awaredList: state.awardedList.concat({
-          worthId: state.worths[state.stage].id,
-          bidder: 333,
-          price: state.nowPrice,
-        }),
+        awardedList: state.awardedList.concat(addObj),
       };
     }
 

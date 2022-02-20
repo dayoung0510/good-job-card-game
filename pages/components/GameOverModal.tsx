@@ -19,11 +19,11 @@ const GameOverModal: React.FC<Props> = ({ handleClose, open }) => {
       {open ? (
         <div className="back">
           <div className="container">
-            <div>게임 종료</div>
+            <div className="over ft-gong">GAME OVER</div>
             <div className="btn-container">
               <button
                 type="button"
-                className="close-btn bg-midsky"
+                className="close-btn bg-navy"
                 onClick={handleNextPage}
               >
                 결과확인
@@ -67,6 +67,9 @@ const GameOverModal: React.FC<Props> = ({ handleClose, open }) => {
           font-family: "Gong";
           color: #fff;
           width: 100%;
+        }
+        .over {
+          font-size: 1.2rem;
         }
       `}</style>
     </>
