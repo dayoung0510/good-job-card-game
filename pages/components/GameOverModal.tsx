@@ -19,7 +19,7 @@ const GameOverModal: React.FC<Props> = ({ handleClose, open }) => {
       {open ? (
         <div className="back">
           <div className="container">
-            <div>over!</div>
+            <div>게임 종료</div>
             <div className="btn-container">
               <button
                 type="button"

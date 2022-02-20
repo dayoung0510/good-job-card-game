@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useReducer } from "react";
 
 const INITIAL_TIME = 1;
+export const BOT_ID = 0;
+export const USER_ID = 1;
 
 type StateType = {
   isPlaying: boolean;
@@ -8,17 +10,19 @@ type StateType = {
   second: number;
   worths: { id: number; name: string }[];
   nowPrice: number;
-  bidder: number | null;
+  nowBidder: number | null;
   botBettingArr: number[];
+  awardedList: { worthId: number; bidder: number; price: number }[];
 };
 
 type ActionType =
   | { type: "SET_IS_PLAYING" }
   | { type: "SET_NEXT_STAGE" }
   | { type: "SET_TIME" }
-  | { type: "BIDDING" }
-  | { type: "START_GAME" }
-  | { type: "FINISH_GAME" };
+  | { type: "BIDDING"; bidder: number }
+  | { type: "INITIALIZE" }
+  | { type: "CHANGE_GAME_STATE"; state: boolean }
+  | { type: "AWARDING" };
 
 type ContextProps = {
   state: StateType;
@@ -42,37 +46,74 @@ const defaultState: StateType = {
     { id: 10, name: "스트레스 관리" },
   ],
   nowPrice: 0,
-  bidder: null,
+  nowBidder: null,
   botBettingArr: [10, 20, 5, 15, 0, 10, 30, 0, 5, 5],
+  awardedList: [],
 };
 
 const reducer = (state: StateType, action: ActionType) => {
   switch (action.type) {
-    case "SET_IS_PLAYING": {
-      return { ...state, isPlaying: false };
-    }
+    //다음 스테이지로 넘어가기
     case "SET_NEXT_STAGE": {
       return {
         ...state,
         stage: state.stage + 1,
         second: INITIAL_TIME,
-        bidder: null,
+        nowBidder: null,
         nowPrice: 0,
       };
     }
+
+    case "AWARDING": {
+      const addObj = {
+        worthId: state.worths[state.stage].id,
+        bidder: state.nowBidder,
+        price: state.nowPrice,
+      };
+      console.log("이걸추가해야댐", addObj);
+      return {
+        ...state,
+        awaredList: state.awardedList.concat({
+          worthId: state.worths[state.stage].id,
+          bidder: 333,
+          price: state.nowPrice,
+        }),
+      };
+    }
+
+    //카운트다운
     case "SET_TIME": {
       return { ...state, second: state.second - 1 };
     }
+
+    //입찰하기 버튼 눌렀을 때 동작
     case "BIDDING": {
-      return { ...state, nowPrice: state.nowPrice + 5 };
+      const bidder = action.bidder;
+      return {
+        ...state,
+        second: INITIAL_TIME,
+        nowBidder: bidder,
+        nowPrice: state.nowPrice + 5,
+      };
     }
-    case "START_GAME": {
+
+    //새 게임 시작
+    case "INITIALIZE": {
       //카드섞기
       //배팅금액섞기
-      return { ...state };
+      return {
+        ...state,
+        stage: 1,
+        second: INITIAL_TIME,
+        nowBidder: null,
+        nowPrice: 0,
+      };
     }
-    case "FINISH_GAME": {
-      return { ...state, isPlaying: false };
+
+    //게임상태 true or false
+    case "CHANGE_GAME_STATE": {
+      const gameState = action.state;
+      return { ...state, isPlaying: gameState };
     }
 
     default: {

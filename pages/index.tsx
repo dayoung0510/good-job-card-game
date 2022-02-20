@@ -1,7 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
+import { useGameContext } from "./contexts/GameContext";
 
 const Home: React.FC = () => {
+  const { state, dispatch } = useGameContext();
+
+  useEffect(() => {
+    dispatch({ type: "CHANGE_GAME_STATE", state: false });
+    dispatch({ type: "INITIALIZE" });
+  }, []);
+
+  console.log(state.isPlaying);
+
   return (
     <div className="container">
       <Link href="/play">

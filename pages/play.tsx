@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useGameContext } from "./contexts/GameContext";
 import GameOverModal from "./components/GameOverModal";
+import { USER_ID } from "./contexts/GameContext";
 
 const Play: React.FC = () => {
   const {
-    state: { second, stage, nowPrice, worths, isPlaying },
+    state: {
+      second,
+      stage,
+      nowPrice,
+      nowBidder,
+      worths,
+      isPlaying,
+      awardedList,
+    },
     dispatch,
   } = useGameContext();
 
@@ -13,12 +22,23 @@ const Play: React.FC = () => {
     setModal(state);
   };
 
+  //game state change
+  useEffect(() => {
+    dispatch({ type: "CHANGE_GAME_STATE", state: true });
+  }, []);
+
   //countdown
   useEffect(() => {
     if (isPlaying) {
       const countDown = setInterval(() => {
         if (second === 0) {
-          dispatch({ type: "SET_NEXT_STAGE" });
+          if (stage < worths.length) {
+            dispatch({ type: "AWARDING" });
+            dispatch({ type: "SET_NEXT_STAGE" });
+          } else {
+            //worths list 끝까지 간 후 게임 종료
+            dispatch({ type: "CHANGE_GAME_STATE", state: false });
+          }
         } else {
           dispatch({ type: "SET_TIME" });
           clearInterval(countDown);
@@ -27,14 +47,7 @@ const Play: React.FC = () => {
 
       return () => clearInterval(countDown);
     }
-  }, [second]);
-
-  //game over
-  useEffect(() => {
-    if (stage > worths.length) {
-      dispatch({ type: "FINISH_GAME" });
-    }
-  }, [stage]);
+  }, [second, isPlaying]);
 
   //modal control
   useEffect(() => {
@@ -43,8 +56,13 @@ const Play: React.FC = () => {
     } else {
       setModal(true);
     }
-    console.log("isPLAYING!");
   }, [isPlaying]);
+
+  const handleBidding = () => {
+    dispatch({ type: "BIDDING", bidder: USER_ID });
+  };
+
+  console.log(awardedList);
 
   return (
     <>
@@ -65,16 +83,30 @@ const Play: React.FC = () => {
             <div className="worth ft-navy">
               {worths.find((worth) => worth.id === stage)?.name}
             </div>
+            <div className="bidder ft-navy">
+              <span>예비낙찰자 </span>
+              <span style={{ fontWeight: 800 }}>{nowBidder}</span>
+            </div>
           </div>
           <div className="btn-container">
-            <button className="bid-btn bg-midsky" type="button">
+            <button
+              className="bid-btn bg-midsky"
+              type="button"
+              onClick={handleBidding}
+            >
               <div>입찰하기</div>
               <div className="ft-sm ft-sky">(최고가 +5만원)</div>
             </button>
           </div>
         </div>
 
-        <div className="right">werwer</div>
+        <div className="right">
+          {awardedList?.map((award) => (
+            <div>
+              {award.bidder}, {award.price}, {award.worthId}
+            </div>
+          ))}
+        </div>
       </div>
 
       {modal && (
@@ -159,6 +191,10 @@ const Play: React.FC = () => {
         .price {
           position: absolute;
           top: 1rem;
+        }
+        .bidder {
+          position: absolute;
+          bottom: 1rem;
         }
       `}</style>
     </>
