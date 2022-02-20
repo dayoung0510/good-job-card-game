@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useGameContext } from "./contexts/GameContext";
-import Result from "./result";
+import GameOverModal from "./components/GameOverModal";
 
 const Play: React.FC = () => {
   const {
@@ -8,6 +8,12 @@ const Play: React.FC = () => {
     dispatch,
   } = useGameContext();
 
+  const [modal, setModal] = useState(false);
+  const handleModalOpen = (state: boolean) => () => {
+    setModal(state);
+  };
+
+  //countdown
   useEffect(() => {
     if (isPlaying) {
       const countDown = setInterval(() => {
@@ -23,11 +29,22 @@ const Play: React.FC = () => {
     }
   }, [second]);
 
+  //game over
   useEffect(() => {
     if (stage > worths.length) {
       dispatch({ type: "FINISH_GAME" });
     }
   }, [stage]);
+
+  //modal control
+  useEffect(() => {
+    if (isPlaying) {
+      setModal(false);
+    } else {
+      setModal(true);
+    }
+    console.log("isPLAYING!");
+  }, [isPlaying]);
 
   return (
     <>
@@ -51,7 +68,7 @@ const Play: React.FC = () => {
           </div>
           <div className="btn-container">
             <button className="bid-btn bg-midsky" type="button">
-              <div>입찰하기</div>{" "}
+              <div>입찰하기</div>
               <div className="ft-sm ft-sky">(최고가 +5만원)</div>
             </button>
           </div>
@@ -59,6 +76,11 @@ const Play: React.FC = () => {
 
         <div className="right">werwer</div>
       </div>
+
+      {modal && (
+        <GameOverModal open={modal} handleClose={handleModalOpen(false)} />
+      )}
+
       <style jsx>{`
         .container {
           width: 100%;
