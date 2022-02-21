@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { useGameContext } from "./contexts/GameContext";
-import GameOverModal from "./components/GameOverModal";
-import { USER_ID } from "./contexts/GameContext";
+import React, { useEffect, useState } from 'react';
+import { useGameContext } from './contexts/GameContext';
+import GameOverModal from './components/GameOverModal';
+import { USER_ID, BOT_ID } from './contexts/GameContext';
+import ScorePanel from './components/ScorePanel';
 
 const Play: React.FC = () => {
   const {
@@ -24,7 +25,7 @@ const Play: React.FC = () => {
 
   //game state change
   useEffect(() => {
-    dispatch({ type: "CHANGE_GAME_STATE", state: true });
+    dispatch({ type: 'CHANGE_GAME_STATE', state: true });
   }, []);
 
   //countdown
@@ -33,14 +34,14 @@ const Play: React.FC = () => {
       const countDown = setInterval(() => {
         if (second === 0) {
           if (stage < worths.length) {
-            dispatch({ type: "AWARDING" });
-            dispatch({ type: "SET_NEXT_STAGE" });
+            dispatch({ type: 'AWARDING' });
+            dispatch({ type: 'SET_NEXT_STAGE' });
           } else {
             //worths list 끝까지 간 후 게임 종료
-            dispatch({ type: "CHANGE_GAME_STATE", state: false });
+            dispatch({ type: 'CHANGE_GAME_STATE', state: false });
           }
         } else {
-          dispatch({ type: "SET_TIME" });
+          dispatch({ type: 'SET_TIME' });
           clearInterval(countDown);
         }
       }, 1000);
@@ -59,53 +60,51 @@ const Play: React.FC = () => {
   }, [isPlaying]);
 
   const handleBidding = () => {
-    dispatch({ type: "BIDDING", bidder: USER_ID });
+    dispatch({ type: 'BIDDING', bidder: USER_ID });
   };
-
-  console.log(awardedList);
 
   return (
     <>
-      <div className="container">
-        <div className="left">
-          <div className="second bg-yellow ft-navy">{second}</div>
-          <div className="stage ft-yellow">
-            {isPlaying ? <div>stage {stage}</div> : <div>game over</div>}
+      <div className='container'>
+        <div className='left'>
+          <div className='second bg-yellow ft-navy'>{second}</div>
+          <div className='stage ft-yellow'>
+            {isPlaying && <div>stage {stage}</div>}
           </div>
         </div>
 
-        <div className="mid">
-          <div className="card bg-sky">
-            <div className="price ft-navy">
+        <div className='mid'>
+          <div className='card bg-sky'>
+            <div className='price ft-navy'>
               <span>현재최고가 </span>
               <span style={{ fontWeight: 800 }}>{nowPrice}만원</span>
             </div>
-            <div className="worth ft-navy">
+            <div className='worth ft-navy'>
               {worths.find((worth) => worth.id === stage)?.name}
             </div>
-            <div className="bidder ft-navy">
+            <div className='bidder ft-navy'>
               <span>예비낙찰자 </span>
-              <span style={{ fontWeight: 800 }}>{nowBidder}</span>
+              <span style={{ fontWeight: 800 }}>
+                {nowBidder === USER_ID && '나'}
+                {nowBidder === BOT_ID && '상대방'}
+                {nowBidder === null && '없음'}
+              </span>
             </div>
           </div>
-          <div className="btn-container">
+          <div className='btn-container'>
             <button
-              className="bid-btn bg-midsky"
-              type="button"
+              className='bid-btn bg-midsky'
+              type='button'
               onClick={handleBidding}
             >
               <div>입찰하기</div>
-              <div className="ft-sm ft-sky">(최고가 +5만원)</div>
+              <div className='ft-sm ft-sky'>(최고가 +5만원)</div>
             </button>
           </div>
         </div>
 
-        <div className="right">
-          {awardedList?.map((award) => (
-            <div>
-              {award.bidder}, {award.price}, {award.worthId}
-            </div>
-          ))}
+        <div className='right'>
+          <ScorePanel awardedList={awardedList} />
         </div>
       </div>
 
@@ -143,7 +142,7 @@ const Play: React.FC = () => {
         }
         .worth {
           font-size: 2rem;
-          font-family: "Gong";
+          font-family: 'Gong';
         }
         .left {
           width: 30%;
@@ -160,7 +159,9 @@ const Play: React.FC = () => {
         .right {
           width: 30%;
           height: 100%;
-          background: green;
+          display: flex;
+          flex-flow: column;
+          row-gap: 2rem;
         }
         .stage {
           width: 10rem;
@@ -180,7 +181,7 @@ const Play: React.FC = () => {
           width: 50%;
           padding: 2rem 0;
           font-size: 2rem;
-          font-family: "Gong";
+          font-family: 'Gong';
           color: #fff;
         }
         .ft-sm {
