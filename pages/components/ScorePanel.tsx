@@ -37,7 +37,7 @@ const ScorePanel: React.FC<{ awardedList: AwardListType[] }> = ({
 
       <style jsx>{`
         .row {
-          padding: 1rem 0.5rem;
+          padding: 1rem;
           border-bottom: 1px solid #ececec;
         }
         .panel {

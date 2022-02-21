@@ -3,6 +3,7 @@ import React, { createContext, useContext, useReducer } from 'react';
 const INITIAL_TIME = 1;
 export const BOT_ID = 0;
 export const USER_ID = 1;
+const INITIAL_MONEY = 50;
 export const defaultWorths = [
   { id: 1, name: '빠른 피드백' },
   { id: 2, name: '자율 출퇴근' },
@@ -49,7 +50,7 @@ type ContextProps = {
 };
 
 const defaultState: StateType = {
-  isPlaying: true,
+  isPlaying: false,
   stage: 1,
   second: INITIAL_TIME,
   worths: defaultWorths,
@@ -74,8 +75,8 @@ const reducer = (state: StateType, action: ActionType) => {
 
     case 'AWARDING': {
       const addObj = {
-        worthId: state.worths[state.stage].id,
-        worthName: state.worths[state.stage].name,
+        worthId: state.worths[state.stage - 1].id,
+        worthName: state.worths[state.stage - 1].name,
         bidder: state.nowBidder,
         price: state.nowPrice,
       };
@@ -106,11 +107,14 @@ const reducer = (state: StateType, action: ActionType) => {
       //카드섞기
       //배팅금액섞기
       return {
-        ...state,
+        isPlaying: false,
         stage: 1,
         second: INITIAL_TIME,
-        nowBidder: null,
+        worths: defaultWorths,
         nowPrice: 0,
+        nowBidder: null,
+        botBettingArr: [10, 20, 5, 15, 0, 10, 30, 0, 5, 5],
+        awardedList: [],
       };
     }
 
